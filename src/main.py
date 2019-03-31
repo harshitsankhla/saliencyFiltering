@@ -124,8 +124,8 @@ def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
     return (weighted_saliency - weighted_saliency.min())/(weighted_saliency.max()-weighted_saliency.min() + 1e-13)
 
 def perform_saliency(rgb_image):
-    superpixels = apply_slic(100,rgb_image)
-    # superpixels = apply_gmm(100, rgb_image)
+    # superpixels = apply_slic(100,rgb_image)
+    superpixels = apply_gmm(100, rgb_image)
 
     mean_rgb,mean_lab,mean_position = apply_abstraction(superpixels,rgb_image)
     show_output(superpixels,rgb_image,mean_rgb,"abstraction")
@@ -146,30 +146,6 @@ def perform_saliency(rgb_image):
     final[:,:,1] = binary_global
     final[:,:,2] = binary_global
     show_output(superpixels,final,global_thresh,"Binary Mask")
-
-    out = out.astype(np.uint8)
-    img = cv2.medianBlur(out[:,:,0],5)
-    img = out[:,:,0]
-    th3 = cv2.adaptiveThreshold(img,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,11,2)
-    final = np.zeros(out.shape)
-    final[:,:,0] = th3
-    final[:,:,1] = th3
-    final[:,:,2] = th3
-    final = final.astype(np.uint8)
-    show_output(superpixels,final,final,"Binary Mask")
-
-    bgdModel = np.zeros((1,65),np.float64)
-    fgdModel = np.zeros((1,65),np.float64)
-
-    mask = np.zeros(rgb_image.shape[:2],np.uint8)
-    mask[binary_global == False] = 0
-    mask[binary_global == True] = 1
-
-    mask, bgdModel, fgdModel = cv2.grabCut(rgb_image,mask,None,bgdModel,fgdModel,5,cv2.GC_INIT_WITH_MASK)
-    mask = np.where((mask==2)|(mask==0),0,1).astype('uint8')
-    fin_img = rgb_image*mask[:,:,np.newaxis]
-    plt.imshow(fin_img),plt.show()
-
 
 if __name__=='__main__':
     filename = str(argv[1])
