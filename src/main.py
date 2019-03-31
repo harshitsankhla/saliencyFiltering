@@ -11,6 +11,7 @@ from skimage.filters import threshold_otsu
 from sys import argv
 
 from slic_segmentation import *
+from gmm_segmentation import apply_gmm
 
 import cv2
 
@@ -69,6 +70,7 @@ def apply_slic(numSegments,rgb_image):
     # plt.axis("off")
     # plt.show()
     return segments
+
 def apply_abstraction(superpixels,rgb_image):
     rgb_image1 = img_as_float(rgb_image)
     lab_image1 = rgb2lab(rgb_image1)
@@ -122,9 +124,9 @@ def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
     return (weighted_saliency - weighted_saliency.min())/(weighted_saliency.max()-weighted_saliency.min() + 1e-13)
 
 def perform_saliency(rgb_image):
-    superpixels = apply_slic(500,rgb_image)
-    # print(superpixels.max()+1)
-    # print(superpixels.shape)
+    superpixels = apply_slic(100,rgb_image)
+    # superpixels = apply_gmm(100, rgb_image)
+
     mean_rgb,mean_lab,mean_position = apply_abstraction(superpixels,rgb_image)
     show_output(superpixels,rgb_image,mean_rgb,"abstraction")
 
@@ -170,7 +172,6 @@ def perform_saliency(rgb_image):
 
 
 if __name__=='__main__':
-    # filename = "./image_dataset/DUT-OMRON-image/DUT-OMRON-image/im005.jpg"
     filename = str(argv[1])
     rgb_image = io.imread(filename)
     perform_saliency(rgb_image)

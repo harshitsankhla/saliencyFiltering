@@ -5,6 +5,8 @@ import matplotlib.pyplot as plt
 import argparse
 import math
 
+from sys import argv
+from skimage.segmentation import mark_boundaries
 
 class Cluster:
 	cluster_index = 1
@@ -158,6 +160,20 @@ class SLIC:
 
 
 if __name__ == '__main__':
+	path = str(argv[1])
 	rgb = io.imread(path)
-	p = SLIC(rgb, 500, 40)
-	superpixels = p.iterate_times(5)
+	
+	numSegments = 100
+	p = SLIC(rgb, numSegments, 40)
+	segments = p.iterate_times(5)
+
+	print(segments.shape)
+	print(len(np.unique(segments)))
+	print(segments[22, :])
+	print(rgb.shape)
+
+	fig = plt.figure("Superpixels -- %d segments" % (numSegments))
+	ax = fig.add_subplot(1, 1, 1)
+	ax.imshow(mark_boundaries(rgb, segments))
+	plt.axis("off")
+	plt.show()
