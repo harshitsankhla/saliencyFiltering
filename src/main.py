@@ -58,17 +58,10 @@ def show_output(superpixels,image,mean_rgb,type):
 
 def apply_slic(numSegments,rgb_image):
     image = img_as_float(rgb_image)
-    # image = rgb2lab(image)
-    # segments = slic(image, n_segments = numSegments, sigma = 5,convert2lab = False)
-
+    
     p = SLIC(rgb_image, numSegments, 40)
     segments = p.iterate_times(2)
-    ## Plotting the segments
-    # fig = plt.figure("Superpixels -- %d segments" % (numSegments))
-    # ax = fig.add_subplot(1, 1, 1)
-    # ax.imshow(mark_boundaries(rgb_image, segments))
-    # plt.axis("off")
-    # plt.show()
+    
     return segments
 
 def apply_abstraction(superpixels,rgb_image):
