@@ -118,8 +118,8 @@ def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
     return (weighted_saliency - weighted_saliency.min())/(weighted_saliency.max()-weighted_saliency.min() + 1e-13)
 
 def perform_saliency(rgb_image):
-    superpixels = apply_slic(100,rgb_image)
-    # superpixels = apply_gmm(100, rgb_image)
+    # superpixels = apply_slic(100,rgb_image)
+    superpixels = apply_gmm(100, rgb_image)
     display_superpixels(rgb_image, superpixels)
 
     mean_rgb,mean_lab,mean_position = apply_abstraction(superpixels,rgb_image)
@@ -146,10 +146,10 @@ if __name__=='__main__':
     filename = str(argv[1])
     rgb_image = io.imread(filename)
 
-    # scale = 3.0
-    # # rgb = rescale(rgb_image, 1.0/4.0, anti_aliasing=False)
+    scale = 4.0
+    rgb = rescale(rgb_image, 1.0/scale, anti_aliasing=False)
     # rgb = resize(rgb_image, (rgb_image.shape[0]/scale, rgb_image.shape[1]/scale), anti_aliasing=True)
-    # print(rgb.shape[0], rgb.shape[1])
-    # display_image(rgb)
+    print(rgb.shape[0], rgb.shape[1])
+    display_image(rgb)
 
-    perform_saliency(rgb_image)
+    perform_saliency(rgb)
