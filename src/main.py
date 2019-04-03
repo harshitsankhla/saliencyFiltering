@@ -11,9 +11,10 @@ from skimage.filters import threshold_otsu
 from sys import argv
 
 from slic_segmentation import *
-from gmm_segmentation import apply_gmm
+from gmm_segmentation import apply_gmm, display_superpixels, display_image
 
 import cv2
+from skimage.transform import resize, rescale
 
 def show_output(superpixels,image,mean_rgb,type):
     if type=="abstraction":
@@ -117,8 +118,9 @@ def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
     return (weighted_saliency - weighted_saliency.min())/(weighted_saliency.max()-weighted_saliency.min() + 1e-13)
 
 def perform_saliency(rgb_image):
-    # superpixels = apply_slic(100,rgb_image)
-    superpixels = apply_gmm(100, rgb_image)
+    superpixels = apply_slic(100,rgb_image)
+    # superpixels = apply_gmm(100, rgb_image)
+    display_superpixels(rgb_image, superpixels)
 
     mean_rgb,mean_lab,mean_position = apply_abstraction(superpixels,rgb_image)
     show_output(superpixels,rgb_image,mean_rgb,"abstraction")
@@ -143,4 +145,11 @@ def perform_saliency(rgb_image):
 if __name__=='__main__':
     filename = str(argv[1])
     rgb_image = io.imread(filename)
+
+    # scale = 3.0
+    # # rgb = rescale(rgb_image, 1.0/4.0, anti_aliasing=False)
+    # rgb = resize(rgb_image, (rgb_image.shape[0]/scale, rgb_image.shape[1]/scale), anti_aliasing=True)
+    # print(rgb.shape[0], rgb.shape[1])
+    # display_image(rgb)
+
     perform_saliency(rgb_image)

@@ -15,7 +15,7 @@ def display_image(rgb):
 	plt.show()
 
 def display_superpixels(rgb, superpixels):
-	fig = plt.figure("gmm_segmented")
+	fig = plt.figure("SuperPixels")
 	ax = fig.add_subplot(1,1,1)
 	ax.imshow(mark_boundaries(rgb, superpixels))
 	plt.axis("off")
