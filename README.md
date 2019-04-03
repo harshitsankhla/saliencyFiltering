@@ -16,3 +16,6 @@
 	1. `python src/main.py <path_to_image>`
 	2. `python src/gmm_segmentation.py <path_to_image>`
 	3. *Superpixels* count can be varied by changing `n_components` in the code.
+
+4. *Resources:*
+	1. [Saliency Filters(CVPR 2012)](http://www.philkr.net/papers/2012-06-01-cvpr/2012-06-01-cvpr.pdf)
