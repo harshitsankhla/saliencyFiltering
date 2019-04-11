@@ -1,5 +1,4 @@
 import numpy as np
-from skimage.segmentation import slic
 from skimage.segmentation import mark_boundaries
 from skimage.util import img_as_float
 from skimage import io
@@ -91,16 +90,20 @@ def apply_abstraction(superpixels,rgb_image):
     return mean_rgb,mean_lab,mean_position
 
 def apply_uniqueness(superpixels,mean_lab,mean_position):
-    weight = np.exp(-cdist(mean_position,mean_position) ** 2/(2*0.25*0.25))
+    sigma_p = 0.25
+    weight = np.exp(-cdist(mean_position,mean_position) ** 2/(2*sigma_p*sigma_p))
     weight = weight/(weight.sum(axis=1)[:,None])
 
+    print('weight shape:', weight.shape)
+    # weight = 1
     uniqueness = (cdist(mean_lab,mean_lab) ** 2 * weight).sum(axis=1)
 
     #normalize
     return (uniqueness - uniqueness.min())/(uniqueness.max()-uniqueness.min() + 1e-13)
 
 def apply_distribution(superpixels,mean_lab,mean_position):
-    weight = np.exp(-cdist(mean_lab,mean_lab) ** 2/(2*20.0*20.0))
+    sigma_c = 20.0
+    weight = np.exp(-cdist(mean_lab,mean_lab) ** 2/(2*sigma_c*sigma_c))
     weight = weight/(weight.sum(axis=1)[:,None])
 
     weighted_mean = np.dot(weight,mean_position)
@@ -109,7 +112,8 @@ def apply_distribution(superpixels,mean_lab,mean_position):
     return (distribution - distribution.min())/(distribution.max()-distribution.min() + 1e-13)
 
 def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
-    saliency = uniqueness * np.exp(-6.0*distribution)
+    k = 6.0
+    saliency = uniqueness * np.exp(-k*distribution)
 
     weight = np.exp(-0.5 * (0.033 * cdist(mean_lab, mean_lab) ** 2 + 0.033 * cdist(mean_position, mean_position) ** 2))
     weight = weight/(weight.sum(axis=1)[:,None])
@@ -120,6 +124,8 @@ def apply_saliency(uniqueness,distribution,mean_lab,mean_position):
 def perform_saliency(rgb_image):
     # superpixels = apply_slic(100,rgb_image)
     superpixels = apply_gmm(100, rgb_image)
+    print('number of superpixels: ', np.unique(superpixels).shape)
+    
     display_superpixels(rgb_image, superpixels)
 
     mean_rgb,mean_lab,mean_position = apply_abstraction(superpixels,rgb_image)
@@ -146,10 +152,10 @@ if __name__=='__main__':
     filename = str(argv[1])
     rgb_image = io.imread(filename)
 
-    scale = 4.0
+    scale = 2.0
     rgb = rescale(rgb_image, 1.0/scale, anti_aliasing=False)
     # rgb = resize(rgb_image, (rgb_image.shape[0]/scale, rgb_image.shape[1]/scale), anti_aliasing=True)
-    print(rgb.shape[0], rgb.shape[1])
+    print('image shape: ', rgb.shape)
     display_image(rgb)
 
     perform_saliency(rgb)
